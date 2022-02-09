@@ -1,0 +1,755 @@
+basePath: /api/v1
+definitions:
+  httputil.HTTPError:
+    properties:
+      code:
+        example: 400
+        type: integer
+      message:
+        example: status bad request
+        type: string
+    type: object
+  model.AddProductReq:
+    properties:
+      amountAvailable:
+        example: 1
+        type: integer
+      cost:
+        example: 5
+        type: integer
+      productName:
+        example: product_name
+        type: string
+    type: object
+  model.AddUserReq:
+    properties:
+      password:
+        type: string
+      role:
+        type: string
+      userName:
+        example: user_name
+        type: string
+    type: object
+  model.BuyResult:
+    properties:
+      change:
+        items:
+          $ref: '#/definitions/model.Coin'
+        type: array
+      productName:
+        example: product_name
+        type: string
+      total:
+        example: 5
+        type: integer
+    type: object
+  model.Coin:
+    properties:
+      value:
+        example: 5
+        type: integer
+    type: object
+  model.DepositResult:
+    properties:
+      deposit:
+        example: 5
+        type: integer
+    type: object
+  model.Product:
+    properties:
+      amountAvailable:
+        example: 1
+        type: integer
+      cost:
+        example: 5
+        type: integer
+      id:
+        example: xxx
+        type: string
+      productName:
+        example: product_name
+        type: string
+      sellerId:
+        type: string
+    type: object
+  model.UpdateProductRequest:
+    properties:
+      amountAvailable:
+        example: 1
+        type: integer
+      cost:
+        example: 5
+        type: integer
+      id:
+        example: xxx
+        type: string
+      productName:
+        example: product_name
+        type: string
+    type: object
+  model.UpdateUserRequest:
+    properties:
+      id:
+        example: xxx
+        type: string
+      password:
+        type: string
+    type: object
+  model.User:
+    properties:
+      deposit:
+        example: 5
+        type: integer
+      id:
+        example: xxx
+        type: string
+      passwordHash:
+        type: string
+      role:
+        type: string
+      token:
+        type: string
+      tokenExpires:
+        type: integer
+      userName:
+        example: user_name
+        type: string
+    type: object
+host: localhost:8081
+info:
+  contact:
+    email: olturua@gmail.com
+    name: API Support
+    url: NA
+  description: This is a MVP Match test task, based on celler example.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: MVP Match test task
+  version: "0.1"
+paths:
+  /buy:
+    put:
+      consumes:
+      - application/json
+      description: Buy given amount of given product for current Buyer user
+      parameters:
+      - description: Product ID
+        in: query
+        name: productId
+        required: true
+        type: string
+      - description: Amount of products
+        in: query
+        name: amountOfProducts
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.BuyResult'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      security:
+      - ApiKeyAuth: []
+      summary: Buy product
+      tags:
+      - Vending Machine
+  /deposit:
+    put:
+      consumes:
+      - application/json
+      description: Deposit a coin of given value for current Buyer user
+      parameters:
+      - description: Coin value
+        enum:
+        - 5
+        - 10
+        - 20
+        - 50
+        - 100
+        in: query
+        name: coinValue
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.DepositResult'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      security:
+      - ApiKeyAuth: []
+      summary: Deposit money
+      tags:
+      - Vending Machine
+  /product:
+    get:
+      consumes:
+      - application/json
+      description: get products
+      parameters:
+      - description: name search by q
+        format: email
+        in: query
+        name: q
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.Product'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      summary: List products
+      tags:
+      - Product
+    post:
+      consumes:
+      - application/json
+      description: Add new product
+      parameters:
+      - description: Add product request
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/model.AddProductReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Product'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      security:
+      - ApiKeyAuth: []
+      summary: Add product
+      tags:
+      - Product
+  /product/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete by product ID
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Ok
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete a product
+      tags:
+      - Product
+    get:
+      consumes:
+      - application/json
+      description: get string by ID
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Product'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      summary: Show a product
+      tags:
+      - Product
+    patch:
+      consumes:
+      - application/json
+      description: Update by json product
+      parameters:
+      - description: Update product info
+        in: body
+        name: product
+        required: true
+        schema:
+          $ref: '#/definitions/model.Product'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.UpdateProductRequest'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      security:
+      - ApiKeyAuth: []
+      summary: Update a product
+      tags:
+      - Product
+  /reset:
+    put:
+      consumes:
+      - application/json
+      description: Reset current user deposit
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.BuyResult'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      security:
+      - ApiKeyAuth: []
+      summary: Reset deposit
+      tags:
+      - Vending Machine
+  /tools/ping:
+    put:
+      consumes:
+      - application/json
+      description: pings
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Pong
+          schema:
+            type: string
+      summary: Ping
+      tags:
+      - Tools
+  /user:
+    get:
+      consumes:
+      - application/json
+      description: get users
+      parameters:
+      - description: name search by q
+        format: email
+        in: query
+        name: q
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.User'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      security:
+      - ApiKeyAuth: []
+      summary: List users
+      tags:
+      - User
+    post:
+      consumes:
+      - application/json
+      description: Add new user
+      parameters:
+      - description: Add user request
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/model.AddUserReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      summary: Add an user
+      tags:
+      - User
+  /user/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete by user ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Ok
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      security:
+      - ApiKeyAuth: []
+      summary: Delete an user
+      tags:
+      - User
+    get:
+      consumes:
+      - application/json
+      description: get string by ID
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.User'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      security:
+      - ApiKeyAuth: []
+      summary: Show an user
+      tags:
+      - User
+    patch:
+      consumes:
+      - application/json
+      description: Update by json user
+      parameters:
+      - description: Update user info
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/model.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.UpdateUserRequest'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      security:
+      - ApiKeyAuth: []
+      summary: Update an user
+      tags:
+      - User
+  /user/login:
+    put:
+      consumes:
+      - application/json
+      description: Logs user in
+      parameters:
+      - description: UserName
+        in: query
+        name: userName
+        required: true
+        type: string
+      - description: Password
+        in: query
+        name: password
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      summary: Login
+      tags:
+      - User
+  /user/logout:
+    put:
+      consumes:
+      - application/json
+      description: Logs user out
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Ok
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      security:
+      - ApiKeyAuth: []
+      summary: Logout
+      tags:
+      - User
+  /user/logout/all:
+    put:
+      consumes:
+      - application/json
+      description: Logs current user ouy of all sessions
+      parameters:
+      - description: UserName
+        in: query
+        name: userName
+        required: true
+        type: string
+      - description: Password
+        in: query
+        name: password
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Ok
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+      summary: Log out all user's sessions
+      tags:
+      - User
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+  BasicAuth:
+    type: basic
+  OAuth2AccessCode:
+    authorizationUrl: https://example.com/oauth/authorize
+    flow: accessCode
+    scopes:
+      admin: '                            Grants read and write access to administrative
+        information'
+    tokenUrl: https://example.com/oauth/token
+    type: oauth2
+  OAuth2Application:
+    flow: application
+    scopes:
+      admin: '                             Grants read and write access to administrative
+        information'
+      write: '                             Grants write access'
+    tokenUrl: https://example.com/oauth/token
+    type: oauth2
+  OAuth2Implicit:
+    authorizationUrl: https://example.com/oauth/authorize
+    flow: implicit
+    scopes:
+      admin: '                          Grants read and write access to administrative
+        information'
+      write: '                          Grants write access'
+    type: oauth2
+  OAuth2Password:
+    flow: password
+    scopes:
+      admin: '                          Grants read and write access to administrative
+        information'
+      read: '                           Grants read access'
+      write: '                          Grants write access'
+    tokenUrl: https://example.com/oauth/token
+    type: oauth2
+swagger: "2.0"
