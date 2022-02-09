@@ -78,13 +78,28 @@ func UserInsert(req *User) (res *User, err error) {
 	return
 }
 
+func UserResetDeposit(id types.Id) (err error) {
+	user := usersByIds[id]
+
+	user.Deposit = 0
+
+	err = UserSave(user)
+	if err != nil {
+		return
+	}
+	return
+}
+
 // UserUpdate part of CRUD
 func UserUpdate(req *UpdateUserRequest) (err error) {
 	user := usersByIds[req.ID]
 
 	user.PasswordHash = tools.Hash(req.Password)
 
-	UserSave(user)
+	err = UserSave(user)
+	if err != nil {
+		return
+	}
 	return
 }
 

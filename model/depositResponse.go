@@ -1,5 +1,5 @@
 package model
 
-type DepositResult struct {
+type DepositResponse struct {
 	Deposit int `json:"deposit" example:"5"`
 }

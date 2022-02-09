@@ -1,6 +1,6 @@
 package model
 
-type LoginResult struct {
+type LoginResponse struct {
 	Token        string `json:"token"`
 	TokenExpires int64  `json:"tokenExpires"`
 }

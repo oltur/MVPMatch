@@ -1,5 +1,5 @@
 package model
 
-type ResetResult struct {
+type ResetResponse struct {
 	Change []*Coin `json:"change"`
 }

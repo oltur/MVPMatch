@@ -49,7 +49,7 @@ func init() {
 		ID:              id,
 		ProductName:     "Product #1",
 		SellerId:        user1.ID,
-		AmountAvailable: 10,
+		AmountAvailable: 1000,
 		Cost:            20,
 	}
 	productsByIds[id] = product1
@@ -59,7 +59,7 @@ func init() {
 		ID:              id,
 		ProductName:     "Product #2",
 		SellerId:        user1.ID,
-		AmountAvailable: 20,
+		AmountAvailable: 1,
 		Cost:            30,
 	}
 	productsByIds[id] = product2
@@ -69,7 +69,7 @@ func init() {
 		ID:              id,
 		ProductName:     "Product #3",
 		SellerId:        user2.ID,
-		AmountAvailable: 30,
+		AmountAvailable: 3000,
 		Cost:            40,
 	}
 	productsByIds[id] = product3

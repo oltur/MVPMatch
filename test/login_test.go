@@ -8,29 +8,34 @@ import (
 	"github.com/oltur/mvp-match/model"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
+	"time"
 )
 
-func TestGetProductOk(t *testing.T) {
+func TestLoginOk(t *testing.T) {
 	router, _ := controller.SetupRouter()
 	w := httptest.NewRecorder()
-	req, _ := http.NewRequest("GET", "/api/v1/product/1", nil)
+	model.UserLogout("1")
+	reqBody := `{"userName":"User #1, Seller", "password": "1"}`
+	req, _ := http.NewRequest("POST", "/api/v1/user/login", strings.NewReader(reqBody))
 	router.ServeHTTP(w, req)
 
 	assert.Equal(t, 200, w.Code)
 
 	body := w.Body.String()
-	var data model.Product
+	var data model.LoginResponse
 	err := json.Unmarshal([]byte(body), &data)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if data.ID != "1" || data.ProductName != "Product #1" {
-		t.Fatal("not the right product")
+	in29Days := time.Now().Add(29 * 24 * time.Hour).UnixMilli()
+	if data.TokenExpires < in29Days {
+		t.Fatal("wrong tokenExpires")
 	}
 }
 
-func TestGetProductFailedDoesNotExist(t *testing.T) {
+func TestLoginFailed(t *testing.T) {
 	router, _ := controller.SetupRouter()
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/api/v1/product/999", nil)

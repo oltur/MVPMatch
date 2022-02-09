@@ -17,18 +17,18 @@ import (
 // @Accept       json
 // @Produce      json
 // @Param        coinValue     query     int     false  "Coin value"       Enums(5, 10, 20, 50, 100)
-// @Success      200  {object}  model.DepositResult
+// @Success      200  {object}  model.DepositResponse
 // @Failure      400  {object}  httputil.HTTPError
 // @Failure      404  {object}  httputil.HTTPError
 // @Failure      500  {object}  httputil.HTTPError
 // @Security     ApiKeyAuth
-// @Router       /deposit [put]
+// @Router       /deposit [post]
 func (c *Controller) Deposit(ctx *gin.Context) {
 	var s string
 	var err error
 	userId, err := c.getUserIdFromContext(ctx)
 	if err != nil {
-		httputil.NewError(ctx, http.StatusUnauthorized, err)
+		httputil.NewError(ctx, http.StatusForbidden, err)
 		return
 	}
 	s = ctx.Query("coinValue")
@@ -64,7 +64,7 @@ func (c *Controller) Deposit(ctx *gin.Context) {
 		return
 	}
 
-	res := &model.DepositResult{Deposit: user.Deposit}
+	res := &model.DepositResponse{Deposit: user.Deposit}
 
 	ctx.JSON(http.StatusOK, res)
 }
@@ -77,18 +77,18 @@ func (c *Controller) Deposit(ctx *gin.Context) {
 // @Produce      json
 // @Param        productId   query      string  true  "Product ID"
 // @Param        amountOfProducts     query     int     false  "Amount of products"
-// @Success      200  {object}  model.BuyResult
+// @Success      200  {object}  model.BuyResponse
 // @Failure      400  {object}  httputil.HTTPError
 // @Failure      404  {object}  httputil.HTTPError
 // @Failure      500  {object}  httputil.HTTPError
 // @Security     ApiKeyAuth
-// @Router       /buy [put]
+// @Router       /buy [post]
 func (c *Controller) Buy(ctx *gin.Context) {
 	var s string
 	var err error
 	userId, err := c.getUserIdFromContext(ctx)
 	if err != nil {
-		httputil.NewError(ctx, http.StatusUnauthorized, err)
+		httputil.NewError(ctx, http.StatusForbidden, err)
 		return
 	}
 	s = ctx.Query("productId")
@@ -156,25 +156,10 @@ func (c *Controller) Buy(ctx *gin.Context) {
 		return
 	}
 
-	res := &model.BuyResult{Total: totalCost, ProductName: product.ProductName, Change: change}
+	res := &model.BuyResponse{Total: totalCost, ProductName: product.ProductName, Change: change}
 
 	ctx.JSON(http.StatusOK, res)
 
-}
-
-func (c *Controller) getUserIdFromContext(ctx *gin.Context) (res types.Id, err error) {
-	x, exists := ctx.Get("userId")
-	if !exists {
-		err = model.ErrUserNotFoundInContext
-		return
-	}
-	s, ok := x.(string)
-	if !ok {
-		err = model.ErrUserNotFoundInContext
-		return
-	}
-	res = types.Id(s)
-	return
 }
 
 // Reset godoc
@@ -183,12 +168,12 @@ func (c *Controller) getUserIdFromContext(ctx *gin.Context) (res types.Id, err e
 // @Tags         Vending Machine
 // @Accept       json
 // @Produce      json
-// @Success      200  {object}  model.BuyResult
+// @Success      200  {object}  model.BuyResponse
 // @Failure      400  {object}  httputil.HTTPError
 // @Failure      404  {object}  httputil.HTTPError
 // @Failure      500  {object}  httputil.HTTPError
 // @Security     ApiKeyAuth
-// @Router       /reset [put]
+// @Router       /reset [post]
 func (c *Controller) Reset(ctx *gin.Context) {
 	var s string
 	var err error
@@ -224,15 +209,13 @@ func (c *Controller) Reset(ctx *gin.Context) {
 		return
 	}
 
-	user.Deposit = 0
-
-	err = model.UserSave(user)
+	err = model.UserResetDeposit(user.ID)
 	if err != nil {
 		httputil.NewError(ctx, http.StatusInternalServerError, err)
 		return
 	}
 
-	res := &model.ResetResult{Change: change}
+	res := &model.ResetResponse{Change: change}
 
 	ctx.JSON(http.StatusOK, res)
 

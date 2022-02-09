@@ -31,7 +31,7 @@ definitions:
         example: user_name
         type: string
     type: object
-  model.BuyResult:
+  model.BuyResponse:
     properties:
       change:
         items:
@@ -50,11 +50,18 @@ definitions:
         example: 5
         type: integer
     type: object
-  model.DepositResult:
+  model.DepositResponse:
     properties:
       deposit:
         example: 5
         type: integer
+    type: object
+  model.LoginRequest:
+    properties:
+      password:
+        type: string
+      userName:
+        type: string
     type: object
   model.Product:
     properties:
@@ -131,7 +138,7 @@ info:
   version: "0.1"
 paths:
   /buy:
-    put:
+    post:
       consumes:
       - application/json
       description: Buy given amount of given product for current Buyer user
@@ -151,7 +158,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.BuyResult'
+            $ref: '#/definitions/model.BuyResponse'
         "400":
           description: Bad Request
           schema:
@@ -170,7 +177,7 @@ paths:
       tags:
       - Vending Machine
   /deposit:
-    put:
+    post:
       consumes:
       - application/json
       description: Deposit a coin of given value for current Buyer user
@@ -191,7 +198,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.DepositResult'
+            $ref: '#/definitions/model.DepositResponse'
         "400":
           description: Bad Request
           schema:
@@ -382,7 +389,7 @@ paths:
       tags:
       - Product
   /reset:
-    put:
+    post:
       consumes:
       - application/json
       description: Reset current user deposit
@@ -392,7 +399,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.BuyResult'
+            $ref: '#/definitions/model.BuyResponse'
         "400":
           description: Bad Request
           schema:
@@ -574,7 +581,7 @@ paths:
         name: user
         required: true
         schema:
-          $ref: '#/definitions/model.User'
+          $ref: '#/definitions/model.UpdateUserRequest'
       produces:
       - application/json
       responses:
@@ -600,21 +607,17 @@ paths:
       tags:
       - User
   /user/login:
-    put:
+    post:
       consumes:
       - application/json
       description: Logs user in
       parameters:
-      - description: UserName
-        in: query
-        name: userName
+      - description: Login Request
+        in: body
+        name: credentials
         required: true
-        type: string
-      - description: Password
-        in: query
-        name: password
-        required: true
-        type: string
+        schema:
+          $ref: '#/definitions/model.LoginRequest'
       produces:
       - application/json
       responses:
@@ -642,7 +645,7 @@ paths:
       tags:
       - User
   /user/logout:
-    put:
+    post:
       consumes:
       - application/json
       description: Logs user out
@@ -671,21 +674,17 @@ paths:
       tags:
       - User
   /user/logout/all:
-    put:
+    post:
       consumes:
       - application/json
       description: Logs current user ouy of all sessions
       parameters:
-      - description: UserName
-        in: query
-        name: userName
+      - description: Login Request
+        in: body
+        name: credentials
         required: true
-        type: string
-      - description: Password
-        in: query
-        name: password
-        required: true
-        type: string
+        schema:
+          $ref: '#/definitions/model.LoginRequest'
       produces:
       - application/json
       responses:
@@ -719,37 +718,4 @@ securityDefinitions:
     type: apiKey
   BasicAuth:
     type: basic
-  OAuth2AccessCode:
-    authorizationUrl: https://example.com/oauth/authorize
-    flow: accessCode
-    scopes:
-      admin: '                            Grants read and write access to administrative
-        information'
-    tokenUrl: https://example.com/oauth/token
-    type: oauth2
-  OAuth2Application:
-    flow: application
-    scopes:
-      admin: '                             Grants read and write access to administrative
-        information'
-      write: '                             Grants write access'
-    tokenUrl: https://example.com/oauth/token
-    type: oauth2
-  OAuth2Implicit:
-    authorizationUrl: https://example.com/oauth/authorize
-    flow: implicit
-    scopes:
-      admin: '                          Grants read and write access to administrative
-        information'
-      write: '                          Grants write access'
-    type: oauth2
-  OAuth2Password:
-    flow: password
-    scopes:
-      admin: '                          Grants read and write access to administrative
-        information'
-      read: '                           Grants read access'
-      write: '                          Grants write access'
-    tokenUrl: https://example.com/oauth/token
-    type: oauth2
 swagger: "2.0"

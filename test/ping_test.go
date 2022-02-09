@@ -8,13 +8,13 @@ import (
 	"testing"
 )
 
-func TestPingRoute(t *testing.T) {
-	router := controller.SetupRouter()
+func TestPing(t *testing.T) {
+	router, _ := controller.SetupRouter()
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("GET", "/api/v1/tools/ping", nil)
 	router.ServeHTTP(w, req)
 
 	assert.Equal(t, 200, w.Code)
-	assert.Equal(t, "Pong", w.Body.String())
+	assert.Equal(t, `"Pong"`, w.Body.String())
 }

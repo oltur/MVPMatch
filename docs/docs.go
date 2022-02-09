@@ -26,7 +26,7 @@ const docTemplate_swagger = `{
     "basePath": "{{.BasePath}}",
     "paths": {
         "/buy": {
-            "put": {
+            "post": {
                 "security": [
                     {
                         "ApiKeyAuth": []
@@ -62,7 +62,7 @@ const docTemplate_swagger = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.BuyResult"
+                            "$ref": "#/definitions/model.BuyResponse"
                         }
                     },
                     "400": {
@@ -87,7 +87,7 @@ const docTemplate_swagger = `{
             }
         },
         "/deposit": {
-            "put": {
+            "post": {
                 "security": [
                     {
                         "ApiKeyAuth": []
@@ -123,7 +123,7 @@ const docTemplate_swagger = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.DepositResult"
+                            "$ref": "#/definitions/model.DepositResponse"
                         }
                     },
                     "400": {
@@ -414,7 +414,7 @@ const docTemplate_swagger = `{
             }
         },
         "/reset": {
-            "put": {
+            "post": {
                 "security": [
                     {
                         "ApiKeyAuth": []
@@ -435,7 +435,7 @@ const docTemplate_swagger = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.BuyResult"
+                            "$ref": "#/definitions/model.BuyResponse"
                         }
                     },
                     "400": {
@@ -591,7 +591,7 @@ const docTemplate_swagger = `{
             }
         },
         "/user/login": {
-            "put": {
+            "post": {
                 "description": "Logs user in",
                 "consumes": [
                     "application/json"
@@ -605,18 +605,13 @@ const docTemplate_swagger = `{
                 "summary": "Login",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "UserName",
-                        "name": "userName",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Password",
-                        "name": "password",
-                        "in": "query",
-                        "required": true
+                        "description": "Login Request",
+                        "name": "credentials",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.LoginRequest"
+                        }
                     }
                 ],
                 "responses": {
@@ -654,7 +649,7 @@ const docTemplate_swagger = `{
             }
         },
         "/user/logout": {
-            "put": {
+            "post": {
                 "security": [
                     {
                         "ApiKeyAuth": []
@@ -700,7 +695,7 @@ const docTemplate_swagger = `{
             }
         },
         "/user/logout/all": {
-            "put": {
+            "post": {
                 "description": "Logs current user ouy of all sessions",
                 "consumes": [
                     "application/json"
@@ -714,18 +709,13 @@ const docTemplate_swagger = `{
                 "summary": "Log out all user's sessions",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "UserName",
-                        "name": "userName",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Password",
-                        "name": "password",
-                        "in": "query",
-                        "required": true
+                        "description": "Login Request",
+                        "name": "credentials",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.LoginRequest"
+                        }
                     }
                 ],
                 "responses": {
@@ -893,7 +883,7 @@ const docTemplate_swagger = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/model.User"
+                            "$ref": "#/definitions/model.UpdateUserRequest"
                         }
                     }
                 ],
@@ -972,7 +962,7 @@ const docTemplate_swagger = `{
                 }
             }
         },
-        "model.BuyResult": {
+        "model.BuyResponse": {
             "type": "object",
             "properties": {
                 "change": {
@@ -1000,12 +990,23 @@ const docTemplate_swagger = `{
                 }
             }
         },
-        "model.DepositResult": {
+        "model.DepositResponse": {
             "type": "object",
             "properties": {
                 "deposit": {
                     "type": "integer",
                     "example": 5
+                }
+            }
+        },
+        "model.LoginRequest": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "userName": {
+                    "type": "string"
                 }
             }
         },
@@ -1104,43 +1105,6 @@ const docTemplate_swagger = `{
         },
         "BasicAuth": {
             "type": "basic"
-        },
-        "OAuth2AccessCode": {
-            "type": "oauth2",
-            "flow": "accessCode",
-            "authorizationUrl": "https://example.com/oauth/authorize",
-            "tokenUrl": "https://example.com/oauth/token",
-            "scopes": {
-                "admin": "                            Grants read and write access to administrative information"
-            }
-        },
-        "OAuth2Application": {
-            "type": "oauth2",
-            "flow": "application",
-            "tokenUrl": "https://example.com/oauth/token",
-            "scopes": {
-                "admin": "                             Grants read and write access to administrative information",
-                "write": "                             Grants write access"
-            }
-        },
-        "OAuth2Implicit": {
-            "type": "oauth2",
-            "flow": "implicit",
-            "authorizationUrl": "https://example.com/oauth/authorize",
-            "scopes": {
-                "admin": "                          Grants read and write access to administrative information",
-                "write": "                          Grants write access"
-            }
-        },
-        "OAuth2Password": {
-            "type": "oauth2",
-            "flow": "password",
-            "tokenUrl": "https://example.com/oauth/token",
-            "scopes": {
-                "admin": "                          Grants read and write access to administrative information",
-                "read": "                           Grants read access",
-                "write": "                          Grants write access"
-            }
         }
     }
 }`

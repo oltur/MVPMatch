@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/oltur/mvp-match/httputil"
 	"github.com/oltur/mvp-match/model"
@@ -17,45 +18,60 @@ import (
 // @Tags         User
 // @Accept       json
 // @Produce      json
-// @Param        userName   query      string  true  "UserName"
-// @Param        password   query      string  true  "Password"
-// @Success      200  {string}  model.LoginResult
+// @Param		 credentials body	model.LoginRequest true  "Login Request"
+// @Success      200  {string}  model.LoginResponse
 // @Failure      400  {object}  httputil.HTTPError
 // @Failure      404  {object}  httputil.HTTPError
 // @Failure      409  {object}  httputil.HTTPError
 // @Failure      500  {object}  httputil.HTTPError
-// @Router       /user/login [put]
+// @Router       /user/login [post]
 func (c *Controller) Login(ctx *gin.Context) {
-	var s string
 	var err error
-
-	s = ctx.Query("userName")
-	userName := s
-	s = ctx.Query("password")
-	password := s
-
-	user, err := model.GetUserByCredentials(userName, password)
+	var req model.LoginRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		httputil.NewError(ctx, http.StatusBadRequest, err)
+		return
+	}
+	gwtToken, tokenExpires, err := c.DoLogin(req.UserName, req.Password)
 	if err != nil {
-		err = model.ErrNotFound
-		httputil.NewError(ctx, http.StatusNotFound, err)
+		if errors.Is(err, model.ErrNotFound) {
+			httputil.NewError(ctx, http.StatusNotFound, err)
+		} else if errors.Is(err, model.ErrActiveSessionExists) {
+			httputil.NewError(ctx, http.StatusConflict, err)
+		} else {
+			httputil.NewError(ctx, http.StatusInternalServerError, err)
+		}
 		return
 	}
 
-	token := xid.New().String()
-	tokenExpires := time.Now().Add(30 * 24 * time.Hour).UnixMilli()
+	res := &model.LoginResponse{
+		Token:        gwtToken,
+		TokenExpires: tokenExpires,
+	}
 
-	gwtToken, err := c.createGwt(string(user.ID), token, tokenExpires)
+	ctx.JSON(http.StatusOK, res)
+}
+
+func (c *Controller) DoLogin(userName string, password string) (gwtToken string, tokenExpires int64, err error) {
+	user, err := model.GetUserByCredentials(userName, password)
+	if err != nil {
+		err = model.ErrNotFound
+		return "", 0, err
+	}
+
+	token := xid.New().String()
+	tokenExpires = time.Now().Add(30 * 24 * time.Hour).UnixMilli()
+
+	gwtToken, err = c.createGwt(string(user.ID), token, tokenExpires)
 	if err != nil {
 		err = model.ErrCannotGenerateUserToken
-		httputil.NewError(ctx, http.StatusInternalServerError, err)
-		return
+		return "", 0, err
 	}
 
 	now := time.Now().UnixMilli()
 	if user.Token != "" && user.TokenExpires >= now {
 		err = model.ErrActiveSessionExists
-		httputil.NewError(ctx, http.StatusConflict, err)
-		return
+		return "", 0, err
 	}
 
 	user.Token = token
@@ -63,16 +79,9 @@ func (c *Controller) Login(ctx *gin.Context) {
 
 	err = model.UserSave(user)
 	if err != nil {
-		httputil.NewError(ctx, http.StatusInternalServerError, err)
-		return
+		return "", 0, err
 	}
-
-	res := &model.LoginResult{
-		Token:        gwtToken,
-		TokenExpires: tokenExpires,
-	}
-
-	ctx.JSON(http.StatusOK, res)
+	return gwtToken, tokenExpires, err
 }
 
 // Logout godoc
@@ -86,11 +95,11 @@ func (c *Controller) Login(ctx *gin.Context) {
 // @Failure      404  {object}  httputil.HTTPError
 // @Failure      500  {object}  httputil.HTTPError
 // @Security     ApiKeyAuth
-// @Router       /user/logout [put]
+// @Router       /user/logout [post]
 func (c *Controller) Logout(ctx *gin.Context) {
 	userId, err := c.getUserIdFromContext(ctx)
 	if err != nil {
-		httputil.NewError(ctx, http.StatusUnauthorized, err)
+		httputil.NewError(ctx, http.StatusForbidden, err)
 		return
 	}
 	// check Admin role
@@ -115,24 +124,21 @@ func (c *Controller) Logout(ctx *gin.Context) {
 // @Tags         User
 // @Accept       json
 // @Produce      json
-// @Param        userName   query      string  true  "UserName"
-// @Param        password   query      string  true  "Password"
+// @Param		 credentials body	model.LoginRequest true  "Login Request"
 // @Success      204  {string}  string "Ok"
 // @Failure      400  {object}  httputil.HTTPError
 // @Failure      404  {object}  httputil.HTTPError
 // @Failure      409  {object}  httputil.HTTPError
 // @Failure      500  {object}  httputil.HTTPError
-// @Router       /user/logout/all [put]
+// @Router       /user/logout/all [post]
 func (c *Controller) LogoutAll(ctx *gin.Context) {
-	var s string
 	var err error
-
-	s = ctx.Query("userName")
-	userName := s
-	s = ctx.Query("password")
-	password := s
-
-	user, err := model.GetUserByCredentials(userName, password)
+	var req model.LoginRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		httputil.NewError(ctx, http.StatusBadRequest, err)
+		return
+	}
+	user, err := model.GetUserByCredentials(req.UserName, req.Password)
 	if err != nil {
 		err = model.ErrNotFound
 		httputil.NewError(ctx, http.StatusNotFound, err)
@@ -170,7 +176,7 @@ func (c *Controller) ShowUser(ctx *gin.Context) {
 
 	userId, err := c.getUserIdFromContext(ctx)
 	if err != nil {
-		httputil.NewError(ctx, http.StatusUnauthorized, err)
+		httputil.NewError(ctx, http.StatusForbidden, err)
 		return
 	}
 	// check Admin role
@@ -181,8 +187,8 @@ func (c *Controller) ShowUser(ctx *gin.Context) {
 	}
 	// can be viewed by themselves or by admin
 	if currentUser.Role != model.UserRoleAdmin && userId != id {
-		err = model.ErrInvalidSeller
-		httputil.NewError(ctx, http.StatusUnauthorized, err)
+		err = model.ErrAccessDenied
+		httputil.NewError(ctx, http.StatusForbidden, err)
 		return
 	}
 
@@ -211,7 +217,7 @@ func (c *Controller) ListUsers(ctx *gin.Context) {
 
 	userId, err := c.getUserIdFromContext(ctx)
 	if err != nil {
-		httputil.NewError(ctx, http.StatusUnauthorized, err)
+		httputil.NewError(ctx, http.StatusForbidden, err)
 		return
 	}
 	// check Admin role
@@ -223,7 +229,7 @@ func (c *Controller) ListUsers(ctx *gin.Context) {
 	// can be viewed by admin only
 	if currentUser.Role != model.UserRoleAdmin {
 		err = model.ErrInvalidSeller
-		httputil.NewError(ctx, http.StatusUnauthorized, err)
+		httputil.NewError(ctx, http.StatusForbidden, err)
 		return
 	}
 
@@ -281,7 +287,7 @@ func (c *Controller) AddUser(ctx *gin.Context) {
 // @Tags         User
 // @Accept       json
 // @Produce      json
-// @Param        user  body      model.User  true  "Update user info"
+// @Param        user  body      model.UpdateUserRequest  true  "Update user info"
 // @Success      200      {object}  model.UpdateUserRequest
 // @Failure      400      {object}  httputil.HTTPError
 // @Failure      404      {object}  httputil.HTTPError
@@ -297,7 +303,7 @@ func (c *Controller) UpdateUser(ctx *gin.Context) {
 
 	userId, err := c.getUserIdFromContext(ctx)
 	if err != nil {
-		httputil.NewError(ctx, http.StatusUnauthorized, err)
+		httputil.NewError(ctx, http.StatusForbidden, err)
 		return
 	}
 	// check Admin role
@@ -309,7 +315,7 @@ func (c *Controller) UpdateUser(ctx *gin.Context) {
 	// can be updated by themselves or by admin
 	if currentUser.Role != model.UserRoleAdmin && userId != updateUserRequest.ID {
 		err = model.ErrInvalidSeller
-		httputil.NewError(ctx, http.StatusUnauthorized, err)
+		httputil.NewError(ctx, http.StatusForbidden, err)
 		return
 	}
 
@@ -340,7 +346,7 @@ func (c *Controller) DeleteUser(ctx *gin.Context) {
 
 	userId, err := c.getUserIdFromContext(ctx)
 	if err != nil {
-		httputil.NewError(ctx, http.StatusUnauthorized, err)
+		httputil.NewError(ctx, http.StatusForbidden, err)
 		return
 	}
 	// check Admin role
@@ -352,7 +358,7 @@ func (c *Controller) DeleteUser(ctx *gin.Context) {
 	// can be deleted by themselves or by admin
 	if currentUser.Role != model.UserRoleAdmin && userId != id {
 		err = model.ErrInvalidSeller
-		httputil.NewError(ctx, http.StatusUnauthorized, err)
+		httputil.NewError(ctx, http.StatusForbidden, err)
 		return
 	}
 

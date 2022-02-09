@@ -1,12 +1,12 @@
 package controller
 
 import (
-	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt"
 	"github.com/oltur/mvp-match/httputil"
 	"github.com/oltur/mvp-match/model"
+	"github.com/oltur/mvp-match/types"
 	"net/http"
 	"strconv"
 	"strings"
@@ -30,7 +30,7 @@ func (c *Controller) Auth() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		gwtToken := ctx.GetHeader("Authorization")
 		if len(gwtToken) == 0 {
-			httputil.NewError(ctx, http.StatusUnauthorized, errors.New("'Authorization' is required Header"))
+			httputil.NewError(ctx, http.StatusUnauthorized, model.ErrUnauthorized)
 			ctx.Abort()
 			return
 		}
@@ -52,8 +52,8 @@ func (c *Controller) Auth() gin.HandlerFunc {
 		}
 
 		if !ok {
-			err = model.ErrUnauthorized
-			httputil.NewError(ctx, http.StatusUnauthorized, err)
+			err = model.ErrAccessDenied
+			httputil.NewError(ctx, http.StatusForbidden, err)
 			ctx.Abort()
 		}
 
@@ -127,4 +127,19 @@ func (c *Controller) validateGwt(gwtToken string) (userId string, token string, 
 // @Router       /tools/ping [put]
 func (c *Controller) Ping(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, "Pong")
+}
+
+func (c *Controller) getUserIdFromContext(ctx *gin.Context) (res types.Id, err error) {
+	x, exists := ctx.Get("userId")
+	if !exists {
+		err = model.ErrUserNotFoundInContext
+		return
+	}
+	s, ok := x.(string)
+	if !ok {
+		err = model.ErrUserNotFoundInContext
+		return
+	}
+	res = types.Id(s)
+	return
 }

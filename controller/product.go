@@ -70,7 +70,7 @@ func (c *Controller) ListProducts(ctx *gin.Context) {
 func (c *Controller) AddProduct(ctx *gin.Context) {
 	userId, err := c.getUserIdFromContext(ctx)
 	if err != nil {
-		httputil.NewError(ctx, http.StatusUnauthorized, err)
+		httputil.NewError(ctx, http.StatusForbidden, err)
 		return
 	}
 	// check Seller role
@@ -81,7 +81,7 @@ func (c *Controller) AddProduct(ctx *gin.Context) {
 	}
 	if user.Role != model.UserRoleSeller {
 		err = model.ErrInvalidSeller
-		httputil.NewError(ctx, http.StatusUnauthorized, err)
+		httputil.NewError(ctx, http.StatusForbidden, err)
 		return
 	}
 
@@ -125,7 +125,7 @@ func (c *Controller) AddProduct(ctx *gin.Context) {
 func (c *Controller) UpdateProduct(ctx *gin.Context) {
 	userId, err := c.getUserIdFromContext(ctx)
 	if err != nil {
-		httputil.NewError(ctx, http.StatusUnauthorized, err)
+		httputil.NewError(ctx, http.StatusForbidden, err)
 		return
 	}
 	// check Seller role
@@ -136,7 +136,7 @@ func (c *Controller) UpdateProduct(ctx *gin.Context) {
 	}
 	if user.Role != model.UserRoleSeller {
 		err = model.ErrInvalidSeller
-		httputil.NewError(ctx, http.StatusUnauthorized, err)
+		httputil.NewError(ctx, http.StatusForbidden, err)
 		return
 	}
 
@@ -174,7 +174,7 @@ func (c *Controller) DeleteProduct(ctx *gin.Context) {
 
 	userId, err := c.getUserIdFromContext(ctx)
 	if err != nil {
-		httputil.NewError(ctx, http.StatusUnauthorized, err)
+		httputil.NewError(ctx, http.StatusForbidden, err)
 		return
 	}
 	// check Seller role
@@ -185,7 +185,7 @@ func (c *Controller) DeleteProduct(ctx *gin.Context) {
 	}
 	if user.Role != model.UserRoleSeller {
 		err = model.ErrInvalidSeller
-		httputil.NewError(ctx, http.StatusUnauthorized, err)
+		httputil.NewError(ctx, http.StatusForbidden, err)
 		return
 	}
 
@@ -198,7 +198,7 @@ func (c *Controller) DeleteProduct(ctx *gin.Context) {
 
 	if product.SellerId != userId {
 		err = model.ErrWrongSeller
-		httputil.NewError(ctx, http.StatusUnauthorized, err)
+		httputil.NewError(ctx, http.StatusForbidden, err)
 		return
 	}
 
