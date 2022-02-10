@@ -163,6 +163,10 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/httputil.HTTPError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
         "404":
           description: Not Found
           schema:
@@ -201,6 +205,10 @@ paths:
             $ref: '#/definitions/model.DepositResponse'
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "401":
+          description: Unauthorized
           schema:
             $ref: '#/definitions/httputil.HTTPError'
         "404":
@@ -273,6 +281,10 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/httputil.HTTPError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
         "404":
           description: Not Found
           schema:
@@ -306,6 +318,10 @@ paths:
             type: string
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "401":
+          description: Unauthorized
           schema:
             $ref: '#/definitions/httputil.HTTPError'
         "404":
@@ -375,6 +391,10 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/httputil.HTTPError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
         "404":
           description: Not Found
           schema:
@@ -402,6 +422,10 @@ paths:
             $ref: '#/definitions/model.BuyResponse'
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "401":
+          description: Unauthorized
           schema:
             $ref: '#/definitions/httputil.HTTPError'
         "404":
@@ -454,6 +478,10 @@ paths:
             type: array
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "401":
+          description: Unauthorized
           schema:
             $ref: '#/definitions/httputil.HTTPError'
         "404":
@@ -524,6 +552,10 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/httputil.HTTPError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
         "404":
           description: Not Found
           schema:
@@ -556,6 +588,10 @@ paths:
             $ref: '#/definitions/model.User'
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "401":
+          description: Unauthorized
           schema:
             $ref: '#/definitions/httputil.HTTPError'
         "404":
@@ -591,6 +627,10 @@ paths:
             $ref: '#/definitions/model.UpdateUserRequest'
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "401":
+          description: Unauthorized
           schema:
             $ref: '#/definitions/httputil.HTTPError'
         "404":
@@ -658,6 +698,10 @@ paths:
             type: string
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/httputil.HTTPError'
+        "401":
+          description: Unauthorized
           schema:
             $ref: '#/definitions/httputil.HTTPError'
         "404":

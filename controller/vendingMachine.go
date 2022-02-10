@@ -21,6 +21,7 @@ import (
 // @Failure      400  {object}  httputil.HTTPError
 // @Failure      404  {object}  httputil.HTTPError
 // @Failure      500  {object}  httputil.HTTPError
+// @Failure      401      {object}  httputil.HTTPError
 // @Security     ApiKeyAuth
 // @Router       /deposit [post]
 func (c *Controller) Deposit(ctx *gin.Context) {
@@ -81,6 +82,7 @@ func (c *Controller) Deposit(ctx *gin.Context) {
 // @Failure      400  {object}  httputil.HTTPError
 // @Failure      404  {object}  httputil.HTTPError
 // @Failure      500  {object}  httputil.HTTPError
+// @Failure      401      {object}  httputil.HTTPError
 // @Security     ApiKeyAuth
 // @Router       /buy [post]
 func (c *Controller) Buy(ctx *gin.Context) {
@@ -172,6 +174,7 @@ func (c *Controller) Buy(ctx *gin.Context) {
 // @Failure      400  {object}  httputil.HTTPError
 // @Failure      404  {object}  httputil.HTTPError
 // @Failure      500  {object}  httputil.HTTPError
+// @Failure      401      {object}  httputil.HTTPError
 // @Security     ApiKeyAuth
 // @Router       /reset [post]
 func (c *Controller) Reset(ctx *gin.Context) {

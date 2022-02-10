@@ -65,6 +65,7 @@ func (c *Controller) ListProducts(ctx *gin.Context) {
 // @Failure      400      {object}  httputil.HTTPError
 // @Failure      404      {object}  httputil.HTTPError
 // @Failure      500      {object}  httputil.HTTPError
+// @Failure      401      {object}  httputil.HTTPError
 // @Security     ApiKeyAuth
 // @Router       /product [post]
 func (c *Controller) AddProduct(ctx *gin.Context) {
@@ -120,6 +121,8 @@ func (c *Controller) AddProduct(ctx *gin.Context) {
 // @Failure      400      {object}  httputil.HTTPError
 // @Failure      404      {object}  httputil.HTTPError
 // @Failure      500      {object}  httputil.HTTPError
+// @Failure      401      {object}  httputil.HTTPError
+// @Failure      401      {object}  httputil.HTTPError
 // @Security     ApiKeyAuth
 // @Router       /product/{id} [patch]
 func (c *Controller) UpdateProduct(ctx *gin.Context) {
@@ -166,6 +169,7 @@ func (c *Controller) UpdateProduct(ctx *gin.Context) {
 // @Failure      400  {object}  httputil.HTTPError
 // @Failure      404  {object}  httputil.HTTPError
 // @Failure      500  {object}  httputil.HTTPError
+// @Failure      401      {object}  httputil.HTTPError
 // @Security     ApiKeyAuth
 // @Router       /product/{id} [delete]
 func (c *Controller) DeleteProduct(ctx *gin.Context) {

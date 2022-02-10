@@ -94,6 +94,7 @@ func (c *Controller) DoLogin(userName string, password string) (gwtToken string,
 // @Failure      400  {object}  httputil.HTTPError
 // @Failure      404  {object}  httputil.HTTPError
 // @Failure      500  {object}  httputil.HTTPError
+// @Failure      401      {object}  httputil.HTTPError
 // @Security     ApiKeyAuth
 // @Router       /user/logout [post]
 func (c *Controller) Logout(ctx *gin.Context) {
@@ -168,6 +169,7 @@ func (c *Controller) LogoutAll(ctx *gin.Context) {
 // @Failure      400  {object}  httputil.HTTPError
 // @Failure      404  {object}  httputil.HTTPError
 // @Failure      500  {object}  httputil.HTTPError
+// @Failure      401      {object}  httputil.HTTPError
 // @Security     ApiKeyAuth
 // @Router       /user/{id} [get]
 func (c *Controller) ShowUser(ctx *gin.Context) {
@@ -211,6 +213,7 @@ func (c *Controller) ShowUser(ctx *gin.Context) {
 // @Failure      400  {object}  httputil.HTTPError
 // @Failure      404  {object}  httputil.HTTPError
 // @Failure      500  {object}  httputil.HTTPError
+// @Failure      401      {object}  httputil.HTTPError
 // @Security     ApiKeyAuth
 // @Router       /user [get]
 func (c *Controller) ListUsers(ctx *gin.Context) {
@@ -292,6 +295,7 @@ func (c *Controller) AddUser(ctx *gin.Context) {
 // @Failure      400      {object}  httputil.HTTPError
 // @Failure      404      {object}  httputil.HTTPError
 // @Failure      500      {object}  httputil.HTTPError
+// @Failure      401      {object}  httputil.HTTPError
 // @Security     ApiKeyAuth
 // @Router       /user/{id} [patch]
 func (c *Controller) UpdateUser(ctx *gin.Context) {
@@ -338,6 +342,7 @@ func (c *Controller) UpdateUser(ctx *gin.Context) {
 // @Failure      400  {object}  httputil.HTTPError
 // @Failure      404  {object}  httputil.HTTPError
 // @Failure      500  {object}  httputil.HTTPError
+// @Failure      401      {object}  httputil.HTTPError
 // @Security     ApiKeyAuth
 // @Router       /user/{id} [delete]
 func (c *Controller) DeleteUser(ctx *gin.Context) {
