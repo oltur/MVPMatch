@@ -41,6 +41,7 @@ func (c *Controller) Auth() gin.HandlerFunc {
 		if err != nil {
 			err = model.ErrCannotValidateUserToken
 			httputil.NewError(ctx, http.StatusInternalServerError, err)
+			ctx.Abort()
 			return
 		}
 
@@ -48,6 +49,7 @@ func (c *Controller) Auth() gin.HandlerFunc {
 		if err != nil {
 			err = model.ErrCannotValidateUserToken
 			httputil.NewError(ctx, http.StatusInternalServerError, err)
+			ctx.Abort()
 			return
 		}
 
@@ -55,6 +57,7 @@ func (c *Controller) Auth() gin.HandlerFunc {
 			err = model.ErrAccessDenied
 			httputil.NewError(ctx, http.StatusForbidden, err)
 			ctx.Abort()
+			return
 		}
 
 		ctx.Set("userId", userId)
