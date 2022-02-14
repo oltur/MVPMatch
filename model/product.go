@@ -46,7 +46,10 @@ func ProductUpdate(req *UpdateProductRequest) (err error) {
 	product.Cost = req.Cost
 	product.AmountAvailable = req.AmountAvailable
 
-	ProductSave(product)
+	err = ProductSave(product)
+	if err != nil {
+		return
+	}
 	return
 }
 
@@ -94,6 +97,8 @@ func ProductInsert(req *Product) (res *Product, err error) {
 	if err != nil {
 		if !errors.Is(err, ErrNotFound) {
 			return
+		} else {
+			err = nil
 		}
 	} else {
 		err = ErrProductIdExists
